@@ -4,19 +4,18 @@ const users = require('../models/users');
 const router = express.Router();
 
 // 회원가입 : 유저 닉네임, 이메일 중복 확인 -> 없으면 createUser
-router.post('./signup', (req, res) => {
+router.post('/signup', (req, res) => {
   const { email, password, username } = req.body;
 
-  if (users.checkEmailExists(email)) {
+  if (users.checkEmailDuplicated(email)) {
     res.send({ message: 'Email already exists' });
   }
 
-  if (users.checkUserNameExists(username)) {
+  if (users.checkUsernameDuplicated(username)) {
     res.send({ message: 'Username already exists' });
   }
 
   const newUser = { email, password, username };
-
   users.createUser(newUser);
 
   res.send({
@@ -25,7 +24,7 @@ router.post('./signup', (req, res) => {
 });
 
 // 로그인 : 유저 id, pw 일치하지 않으면 에러(401) -> 있으면 토큰 발급 & 쿠키에 저장
-router.post('./signin', (req, res) => {
+router.post('/signin', (req, res) => {
   const { email, password } = req.body;
 
   const user = users.getUserByEmailPw({ email, password });
@@ -52,9 +51,34 @@ router.post('./signin', (req, res) => {
     });
 });
 
-router.get('./signout', (req, res) => {
+router.get('/signout', (req, res) => {
   res
     .clearCookie('accessToken')
     .status(200)
     .send({ messsage: 'Successfully logged out ' });
 });
+
+router.post('/email-check', (req, res) => {
+  const { email } = req.body;
+
+  const isEmailDuplicated = users.checkEmailDuplicated(email);
+
+  if (isEmailDuplicated) {
+    return res.status(409).send({ message: 'Username already exists' });
+  }
+
+  return res.sendStatus(200);
+});
+
+router.post('/username-check', (req, res) => {
+  const { username } = req.body;
+
+  const isUsernameDuplicated = users.checkUsernameDuplicated(username);
+  if (isUsernameDuplicated) {
+    return res.status(409).send({ message: 'Username already Exists' });
+  }
+
+  return res.sendStatus(200);
+});
+
+module.exports = router;

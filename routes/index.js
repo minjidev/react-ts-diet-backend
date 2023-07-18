@@ -6,7 +6,7 @@ const router = express.Router();
 const auth = require('./auth');
 const recipes = require('./recipe');
 
-router.use('./auth', auth);
-router.use('./recipes', recipes);
+router.use('/auth', auth);
+router.use('/recipes', recipes);
 
 module.exports = router;

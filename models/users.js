@@ -35,6 +35,8 @@ let users = [
 
 const createUserId = () => Math.max(...users.map((user) => user.userId), 0);
 
+const getUser = () => users;
+
 const generateToken = (user) => {
   const token = jwt.sign(user, process.env.JWT_SECRET_KEY, {
     expiresIn: '7d',
@@ -57,19 +59,20 @@ const createUser = (newUser) => {
   return newUser;
 };
 
-const checkEmailExists = (_email) =>
+const checkEmailDuplicated = (_email) =>
   !!users.find(({ email }) => _email === email);
 
-const checkUserNameExists = (_username) =>
+const checkUsernameDuplicated = (_username) =>
   !!users.find(({ username }) => _username === username);
 
 module.exports = {
   createUserId,
   createUser,
   getUserByNickname,
+  getUser,
   getUserByEmail,
   getUserByEmailPw,
   generateToken,
-  checkEmailExists,
-  checkUserNameExists,
+  checkEmailDuplicated,
+  checkUsernameDuplicated,
 };
