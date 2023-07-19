@@ -7,14 +7,6 @@ const router = express.Router();
 router.post('/signup', (req, res) => {
   const { email, password, username } = req.body;
 
-  if (users.checkEmailDuplicated(email)) {
-    res.send({ message: 'Email already exists' });
-  }
-
-  if (users.checkUsernameDuplicated(username)) {
-    res.send({ message: 'Username already exists' });
-  }
-
   const newUser = { email, password, username };
   users.createUser(newUser);
 
@@ -51,7 +43,7 @@ router.post('/signin', (req, res) => {
     });
 });
 
-router.get('/signout', (req, res) => {
+router.post('/signout', (req, res) => {
   res
     .clearCookie('accessToken')
     .status(200)
@@ -64,7 +56,7 @@ router.post('/email-check', (req, res) => {
   const isEmailDuplicated = users.checkEmailDuplicated(email);
 
   if (isEmailDuplicated) {
-    return res.status(409).send({ message: 'Username already exists' });
+    return res.status(409).send({ message: 'Email already exists' });
   }
 
   return res.sendStatus(200);

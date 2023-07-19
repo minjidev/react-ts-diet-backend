@@ -4,32 +4,32 @@ let users = [
   {
     userId: 0,
     email: 'test@naver.com',
-    password: '123123',
-    usernmae: 'Test 계정',
+    password: '123123123',
+    username: 'Test 계정',
   },
   {
     userId: 1,
     email: 'bin000527@naver.com',
     password: '12345678',
-    usernmae: '웨스트달러예빈',
+    username: '웨스트달러예빈',
   },
   {
     userId: 2,
     email: 'rok.ksohn@gmail.com',
     password: '12345678',
-    usernmae: '유사한국인제임스',
+    username: '유사한국인제임스',
   },
   {
     userId: 3,
     email: 'alswl99710@gmail.com',
     password: '12345678',
-    usernmae: '서면퀸민지',
+    username: '서면퀸민지',
   },
   {
     userId: 4,
     email: 'sanbondeveloper@gmail.com',
     password: 'adfkjadfkjakfd',
-    usernmae: '피오깃경민',
+    username: '피오깃경민',
   },
 ];
 
