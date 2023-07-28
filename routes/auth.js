@@ -1,5 +1,6 @@
 const express = require('express');
 const users = require('../models/users');
+const recipes = require('../models/recipes');
 
 const router = express.Router();
 
@@ -23,11 +24,12 @@ router.post('/signin', (req, res) => {
 
   // 401: Unauthorized
   if (!user) {
-    res.send(401).send({ error: 'Email or password incorrect' });
+    res.sendStatus(401).send({ error: 'Email or password incorrect' });
   }
 
   // 토큰 생성
   const accessToken = users.generateToken({ email, password });
+  const savedRecipes = recipes.getSavedRecipesByEmail(email);
 
   // 쿠키에 저장
   res
@@ -38,7 +40,7 @@ router.post('/signin', (req, res) => {
     })
     .status(200)
     .send({
-      user: { email, username: user.username },
+      user: { email, username: user.username, savedRecipes },
       message: 'Logged in succesfully !',
     });
 });
