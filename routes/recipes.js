@@ -4,15 +4,7 @@ const recipes = require('../models/recipes');
 const router = express.Router();
 
 router.post('/', (req, res) => {
-  const { user, recipe, date, savedAt } = req.body;
-
-  const savedRecipe = {
-    recipeId: recipes.createRecipeId(),
-    user: user.email,
-    recipe,
-    date,
-    savedAt,
-  };
+  const savedRecipe = req.body;
 
   recipes.createSavedRecipe(savedRecipe);
 
@@ -29,7 +21,7 @@ router.get('/', (req, res) => {
     date,
     email,
   });
-  console.log('saved: ', savedRecipesByDate);
+
   res.send(savedRecipesByDate);
 });
 
