@@ -25,4 +25,12 @@ router.get('/', (req, res) => {
   res.send(savedRecipesByDate);
 });
 
+router.delete('/:recipeId', (req, res) => {
+  const { recipeId } = req.params;
+
+  recipes.deleteRecipesByRecipeId(recipeId);
+
+  res.sendStatus(200);
+});
+
 module.exports = router;
