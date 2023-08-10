@@ -24,7 +24,7 @@ router.post('/signin', (req, res) => {
 
   // 401: Unauthorized
   if (!user) {
-    res.sendStatus(401).send({ error: 'Email or password incorrect' });
+    return res.sendStatus(401).send({ error: 'Email or password incorrect' });
   }
 
   // 토큰 생성
@@ -32,7 +32,7 @@ router.post('/signin', (req, res) => {
   const savedRecipes = recipes.getSavedRecipesByEmail(email);
 
   // 쿠키에 저장
-  res
+  return res
     .cookie('accessToken', accessToken, {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       httpOnly: true,
