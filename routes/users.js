@@ -1,17 +1,8 @@
 /* eslint-disable no-restricted-syntax */
+const express = require('express');
+const SavedRecipes = require('../schemas/savedRecipes');
 
-let recipes = [];
-const createRecipeId = () =>
-  Math.max(...recipes.map((recipe) => recipe.recipeId), 0) + 1;
-
-const createSavedRecipe = (newlySavedRecipe) => {
-  recipes = [...recipes, newlySavedRecipe];
-
-  return newlySavedRecipe;
-};
-
-const getSavedRecipesByEmail = (email) =>
-  recipes.filter((recipe) => recipe.user === email);
+const router = express.Router();
 
 const getTotalDaily = ({ recipesByDate, mainNutrients }) => {
   let totalDailyByDate = [];
@@ -74,19 +65,8 @@ const getTotalNutrients = ({ recipesByDate, mainNutrients }) => {
   return totalNutrientsByDate;
 };
 
-const isSameDate = (date1, date2) =>
-  date1.getFullYear() === date2.getFullYear() &&
-  date1.getMonth() === date2.getMonth() &&
-  date1.getDate() === date2.getDate();
-
-const getSavedRecipesByDateandEmail = ({ email, date }) => {
+const getSavedRecipesByDateandEmail = (recipesByDate) => {
   const mainNutrients = ['Energy', 'Fat', 'Carbs', 'Protein'];
-
-  const recipesByDate = recipes.filter(
-    (recipe) =>
-      recipe.user === email &&
-      isSameDate(new Date(recipe.date), new Date(date)),
-  );
 
   const totalDailyByDate = getTotalDaily({ recipesByDate, mainNutrients });
   const totalNutrientsByDate = getTotalNutrients({
@@ -101,17 +81,71 @@ const getSavedRecipesByDateandEmail = ({ email, date }) => {
   };
 };
 
-const deleteRecipesByRecipeId = (recipeId) => {
-  recipes = recipes.filter((saved) => saved.recipe.recipeId !== recipeId);
+// get recipes saved by user
+router.get('/:userId/recipes', async (req, res) => {
+  try {
+    const { date } = req.query;
+    const { userId } = req.params;
+    if (!date) {
+      const savedRecipes = await SavedRecipes.find({ userId });
+      return res.status(200).json(savedRecipes);
+    }
 
-  console.log('recipes: ', recipes);
-};
+    const searchDate = new Date(date);
 
-module.exports = {
-  recipes,
-  createRecipeId,
-  createSavedRecipe,
-  getSavedRecipesByEmail,
-  getSavedRecipesByDateandEmail,
-  deleteRecipesByRecipeId,
-};
+    const y = searchDate.getUTCFullYear();
+    const m = searchDate.getUTCMonth();
+    const d = searchDate.getUTCDate();
+
+    const startDate = new Date(y, m, d);
+    const endDate = new Date(y, m, d + 1);
+
+    const savedRecipes = await SavedRecipes.find({
+      userId,
+      savedAt: {
+        $gte: startDate,
+        $lt: endDate,
+      },
+    });
+
+    const savedRecipesByDate = getSavedRecipesByDateandEmail(savedRecipes);
+    return res.status(200).json(savedRecipesByDate);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// save recipe
+router.post('/', async (req, res) => {
+  try {
+    const { recipe, savedAt, userId } = req.body;
+    const savedRecipe = await SavedRecipes.create({
+      userId,
+      recipe,
+      savedAt,
+    });
+
+    res.status(201).send({ message: 'Recipe saved successfully', savedRecipe });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
+});
+
+// delete recipe
+router.delete('/:savedRecipeId', async (req, res) => {
+  try {
+    const { savedRecipeId } = req.params;
+
+    const result = await SavedRecipes.deleteOne({ _id: savedRecipeId });
+
+    if (result.deletedCount === 1) return res.sendStatus(200);
+    return res.status(404).json({ message: 'Saved recipe not found' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+module.exports = router;

@@ -2,6 +2,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 
 const dotenv = require('dotenv');
+const connect = require('../schemas/index');
 
 dotenv.config();
 
@@ -11,7 +12,7 @@ const port = process.env.PORT || 8000;
 const api = require('../routes');
 const jwtMiddleware = require('../lib/jwtMiddleware');
 
-// 항상 요청되는 미들웨어
+connect();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

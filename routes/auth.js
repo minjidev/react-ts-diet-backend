@@ -1,37 +1,42 @@
 const express = require('express');
-const users = require('../models/users');
-const recipes = require('../models/recipes');
+const jwt = require('jsonwebtoken');
+const Users = require('../schemas/users');
 
 const router = express.Router();
 
-// 회원가입 : 유저 닉네임, 이메일 중복 확인 -> 없으면 createUser
-router.post('/signup', (req, res) => {
+// Register
+router.post('/signup', async (req, res) => {
   const { email, password, username } = req.body;
 
   const newUser = { email, password, username };
-  users.createUser(newUser);
+  await Users.create(newUser);
 
-  res.send({
+  res.json({
     message: 'Signed up succesfully !',
   });
 });
 
-// 로그인 : 유저 id, pw 일치하지 않으면 에러(401) -> 있으면 토큰 발급 & 쿠키에 저장
-router.post('/signin', (req, res) => {
+// LogIn : if user id, pw not match(401) -> if matches, issue token & save in cookie
+router.post('/signin', async (req, res) => {
   const { email, password } = req.body;
 
-  const user = users.getUserByEmailPw({ email, password });
+  const user = await Users.findOne({ email, password });
 
   // 401: Unauthorized
   if (!user) {
-    return res.sendStatus(401).send({ error: 'Email or password incorrect' });
+    return res.status(401).send({ error: 'Email or password incorrect' });
   }
 
-  // 토큰 생성
-  const accessToken = users.generateToken({ email, password });
-  const savedRecipes = recipes.getSavedRecipesByEmail(email);
+  // create token
+  const accessToken = jwt.sign(
+    { email, password },
+    process.env.JWT_SECRET_KEY,
+    {
+      expiresIn: '7d',
+    },
+  );
 
-  // 쿠키에 저장
+  // save in cookie
   return res
     .cookie('accessToken', accessToken, {
       maxAge: 1000 * 60 * 60 * 24 * 7,
@@ -39,8 +44,8 @@ router.post('/signin', (req, res) => {
       secure: process.env.NODE_ENV === 'production',
     })
     .status(200)
-    .send({
-      user: { email, username: user.username, savedRecipes },
+    .json({
+      user,
       message: 'Logged in succesfully !',
     });
 });
@@ -49,13 +54,13 @@ router.post('/signout', (req, res) => {
   res
     .clearCookie('accessToken')
     .status(200)
-    .send({ messsage: 'Successfully logged out ' });
+    .json({ messsage: 'Successfully logged out ' });
 });
 
-router.post('/email-check', (req, res) => {
+router.post('/email-check', async (req, res) => {
   const { email } = req.body;
 
-  const isEmailDuplicated = users.checkEmailDuplicated(email);
+  const isEmailDuplicated = await Users.exists({ email });
 
   if (isEmailDuplicated) {
     return res.status(409).send({ message: 'Email already exists' });
@@ -64,10 +69,10 @@ router.post('/email-check', (req, res) => {
   return res.sendStatus(200);
 });
 
-router.post('/username-check', (req, res) => {
+router.post('/username-check', async (req, res) => {
   const { username } = req.body;
 
-  const isUsernameDuplicated = users.checkUsernameDuplicated(username);
+  const isUsernameDuplicated = await Users.exists({ username });
   if (isUsernameDuplicated) {
     return res.status(409).send({ message: 'Username already Exists' });
   }
