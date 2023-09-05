@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
-const mongoDB = 'mongodb://root:rootuser@localhost:27017/admin';
+const mongoDB =
+  'mongodb://root:rootuser@127.0.0.0:27017/admin?authSource=admin';
 
 const connect = async () => {
   if (process.env.NODE_ENV !== 'production') {
