@@ -1,6 +1,6 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
-
+const cors = require('cors');
 const dotenv = require('dotenv');
 const connect = require('../schemas/index');
 
@@ -11,6 +11,8 @@ const port = process.env.PORT || 8000;
 
 const api = require('../routes');
 const jwtMiddleware = require('../lib/jwtMiddleware');
+
+app.use(cors());
 
 connect();
 
