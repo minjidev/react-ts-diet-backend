@@ -12,7 +12,11 @@ const port = process.env.PORT || 8000;
 const api = require('../routes');
 const jwtMiddleware = require('../lib/jwtMiddleware');
 
-app.use(cors());
+app.use(
+  cors({
+    origin: '*',
+  }),
+);
 
 connect();
 
@@ -22,6 +26,11 @@ app.use(cookieParser());
 app.use(jwtMiddleware);
 
 app.use('/api', api);
+
+app.get('/', () => {
+  console.log('Starting');
+});
+
 app.listen(port, () => {
   console.log(`[server]: Server is running at ${port}`);
 });
