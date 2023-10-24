@@ -27,8 +27,9 @@ app.use(jwtMiddleware);
 
 app.use('/api', api);
 
-app.get('/', () => {
+app.get('/', (req, res) => {
   console.log('Starting');
+  res.sendStatus(200);
 });
 
 app.listen(port, () => {
