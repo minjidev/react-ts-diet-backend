@@ -12,11 +12,7 @@ const port = process.env.PORT || 8000;
 const api = require('../routes');
 const jwtMiddleware = require('../lib/jwtMiddleware');
 
-app.use(
-  cors({
-    origin: '*',
-  }),
-);
+app.use(cors());
 
 connect();
 
