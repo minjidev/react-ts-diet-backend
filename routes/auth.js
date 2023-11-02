@@ -19,7 +19,7 @@ router.post('/signup', async (req, res) => {
 // LogIn : if user id, pw not match(401) -> if matches, issue token & save in cookie
 router.post('/signin', async (req, res) => {
   const { email, password } = req.body;
-
+  // console.log('email: ', email, password);
   const user = await Users.findOne({ email, password });
 
   // 401: Unauthorized
