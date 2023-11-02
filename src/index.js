@@ -12,7 +12,13 @@ const port = process.env.PORT || 8000;
 const api = require('../routes');
 const jwtMiddleware = require('../lib/jwtMiddleware');
 
-app.use(cors());
+const corsOptions = {
+  origin: 'https://nutrinotes.net',
+  methods: 'GET,PUT,POST,DELETE',
+  allowedHeaders: 'Content-Type,Authorization',
+};
+
+app.use(cors(corsOptions));
 
 connect();
 
