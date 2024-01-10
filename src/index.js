@@ -13,7 +13,7 @@ const api = require('../routes');
 const jwtMiddleware = require('../lib/jwtMiddleware');
 
 const corsOptions = {
-  origin: 'https://nutrinotes.net',
+  origin: ['https://nutrinotes.net', 'http://localhost:5174'],
   methods: 'GET,PUT,POST,DELETE',
   allowedHeaders: 'Content-Type,Authorization',
 };
