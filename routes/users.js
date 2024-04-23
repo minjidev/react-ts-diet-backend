@@ -86,6 +86,7 @@ router.get('/:userId/recipes', async (req, res) => {
   try {
     const { date } = req.query;
     const { userId } = req.params;
+
     if (!date) {
       const savedRecipes = await SavedRecipes.find({ userId });
       return res.status(200).json(savedRecipes);
@@ -97,8 +98,8 @@ router.get('/:userId/recipes', async (req, res) => {
     const m = searchDate.getUTCMonth();
     const d = searchDate.getUTCDate();
 
-    const startDate = new Date(y, m, d);
-    const endDate = new Date(y, m, d + 1);
+    const startDate = new Date(Date.UTC(y, m, d));
+    const endDate = new Date(Date.UTC(y, m, d + 1));
 
     const savedRecipes = await SavedRecipes.find({
       userId,
